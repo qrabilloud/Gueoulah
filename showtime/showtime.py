@@ -1,10 +1,10 @@
 import grpc
 from concurrent import futures
-import showtime_pb2
-import showtime_pb2_grpc
+import times_pb2
+import times_pb2_grpc
 import json
 
-class ShowtimeServicer(showtime_pb2_grpc.ShowtimeServicer):
+class ShowtimeServicer(times_pb2_grpc.ShowtimeServicer):
 
     def __init__(self):
         with open('{}/data/times.json'.format("."), "r") as jsf:

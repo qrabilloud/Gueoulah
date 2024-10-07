@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-service Times {
+service ShowTime {
     rpc GetMovieByDate(MovieDate) returns (stream MovieData) {}
     rpc GetSchedule(Empty) returns (stream ShowTime) {}
 }
