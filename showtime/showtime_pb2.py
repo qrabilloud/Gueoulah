@@ -24,7 +24,7 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x0eshowtime.proto\"\x19\n\tMovieDate\x12\x0c\n\x04\x64\x61te\x18\x01 \x01(\t\"H\n\tMovieData\x12\r\n\x05title\x18\x01 \x01(\t\x12\x0e\n\x06rating\x18\x02 \x01(\x02\x12\x10\n\x08\x64irector\x18\x03 \x01(\t\x12\n\n\x02id\x18\x04 \x01(\t\"4\n\x08TimeShow\x12\n\n\x02id\x18\x01 \x01(\t\x12\x0c\n\x04\x64\x61te\x18\x02 \x01(\t\x12\x0e\n\x06movies\x18\x03 \x03(\t\"\x07\n\x05\x45mpty2^\n\x08ShowTime\x12,\n\x0eGetMovieByDate\x12\n.MovieDate\x1a\n.MovieData\"\x00\x30\x01\x12$\n\x0bGetSchedule\x12\x06.Empty\x1a\t.TimeShow\"\x00\x30\x01\x62\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x0eshowtime.proto\"\x19\n\tMovieDate\x12\x0c\n\x04\x64\x61te\x18\x01 \x01(\t\"\x19\n\x07MovieID\x12\x0e\n\x06movies\x18\x01 \x03(\t\"(\n\x08TimeShow\x12\x0c\n\x04\x64\x61te\x18\x01 \x01(\t\x12\x0e\n\x06movies\x18\x02 \x03(\t\"\x07\n\x05\x45mpty2Z\n\x08ShowTime\x12(\n\x0eGetMovieByDate\x12\n.MovieDate\x1a\x08.MovieID\"\x00\x12$\n\x0bGetSchedule\x12\x06.Empty\x1a\t.TimeShow\"\x00\x30\x01\x62\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -33,12 +33,12 @@ if not _descriptor._USE_C_DESCRIPTORS:
   DESCRIPTOR._loaded_options = None
   _globals['_MOVIEDATE']._serialized_start=18
   _globals['_MOVIEDATE']._serialized_end=43
-  _globals['_MOVIEDATA']._serialized_start=45
-  _globals['_MOVIEDATA']._serialized_end=117
-  _globals['_TIMESHOW']._serialized_start=119
-  _globals['_TIMESHOW']._serialized_end=171
-  _globals['_EMPTY']._serialized_start=173
-  _globals['_EMPTY']._serialized_end=180
-  _globals['_SHOWTIME']._serialized_start=182
-  _globals['_SHOWTIME']._serialized_end=276
+  _globals['_MOVIEID']._serialized_start=45
+  _globals['_MOVIEID']._serialized_end=70
+  _globals['_TIMESHOW']._serialized_start=72
+  _globals['_TIMESHOW']._serialized_end=112
+  _globals['_EMPTY']._serialized_start=114
+  _globals['_EMPTY']._serialized_end=121
+  _globals['_SHOWTIME']._serialized_start=123
+  _globals['_SHOWTIME']._serialized_end=213
 # @@protoc_insertion_point(module_scope)

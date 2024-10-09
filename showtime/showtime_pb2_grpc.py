@@ -34,10 +34,10 @@ class ShowTimeStub(object):
         Args:
             channel: A grpc.Channel.
         """
-        self.GetMovieByDate = channel.unary_stream(
+        self.GetMovieByDate = channel.unary_unary(
                 '/ShowTime/GetMovieByDate',
                 request_serializer=showtime__pb2.MovieDate.SerializeToString,
-                response_deserializer=showtime__pb2.MovieData.FromString,
+                response_deserializer=showtime__pb2.MovieID.FromString,
                 _registered_method=True)
         self.GetSchedule = channel.unary_stream(
                 '/ShowTime/GetSchedule',
@@ -64,10 +64,10 @@ class ShowTimeServicer(object):
 
 def add_ShowTimeServicer_to_server(servicer, server):
     rpc_method_handlers = {
-            'GetMovieByDate': grpc.unary_stream_rpc_method_handler(
+            'GetMovieByDate': grpc.unary_unary_rpc_method_handler(
                     servicer.GetMovieByDate,
                     request_deserializer=showtime__pb2.MovieDate.FromString,
-                    response_serializer=showtime__pb2.MovieData.SerializeToString,
+                    response_serializer=showtime__pb2.MovieID.SerializeToString,
             ),
             'GetSchedule': grpc.unary_stream_rpc_method_handler(
                     servicer.GetSchedule,
@@ -96,12 +96,12 @@ class ShowTime(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_stream(
+        return grpc.experimental.unary_unary(
             request,
             target,
             '/ShowTime/GetMovieByDate',
             showtime__pb2.MovieDate.SerializeToString,
-            showtime__pb2.MovieData.FromString,
+            showtime__pb2.MovieID.FromString,
             options,
             channel_credentials,
             insecure,
