@@ -4,6 +4,7 @@ import grpc
 import warnings
 
 import showtime_pb2 as showtime__pb2
+import super_pb2 as super__pb2
 
 GRPC_GENERATED_VERSION = '1.66.1'
 GRPC_VERSION = grpc.__version__
@@ -34,15 +35,15 @@ class ShowTimeStub(object):
         Args:
             channel: A grpc.Channel.
         """
-        self.GetMovieByDate = channel.unary_stream(
+        self.GetMovieByDate = channel.unary_unary(
                 '/ShowTime/GetMovieByDate',
                 request_serializer=showtime__pb2.MovieDate.SerializeToString,
-                response_deserializer=showtime__pb2.MovieData.FromString,
+                response_deserializer=showtime__pb2.MovieID.FromString,
                 _registered_method=True)
         self.GetSchedule = channel.unary_stream(
                 '/ShowTime/GetSchedule',
-                request_serializer=showtime__pb2.Empty.SerializeToString,
-                response_deserializer=showtime__pb2.TimeShow.FromString,
+                request_serializer=super__pb2.Empty.SerializeToString,
+                response_deserializer=super__pb2.TimeShow.FromString,
                 _registered_method=True)
 
 
@@ -64,15 +65,15 @@ class ShowTimeServicer(object):
 
 def add_ShowTimeServicer_to_server(servicer, server):
     rpc_method_handlers = {
-            'GetMovieByDate': grpc.unary_stream_rpc_method_handler(
+            'GetMovieByDate': grpc.unary_unary_rpc_method_handler(
                     servicer.GetMovieByDate,
                     request_deserializer=showtime__pb2.MovieDate.FromString,
-                    response_serializer=showtime__pb2.MovieData.SerializeToString,
+                    response_serializer=showtime__pb2.MovieID.SerializeToString,
             ),
             'GetSchedule': grpc.unary_stream_rpc_method_handler(
                     servicer.GetSchedule,
-                    request_deserializer=showtime__pb2.Empty.FromString,
-                    response_serializer=showtime__pb2.TimeShow.SerializeToString,
+                    request_deserializer=super__pb2.Empty.FromString,
+                    response_serializer=super__pb2.TimeShow.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -96,12 +97,12 @@ class ShowTime(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_stream(
+        return grpc.experimental.unary_unary(
             request,
             target,
             '/ShowTime/GetMovieByDate',
             showtime__pb2.MovieDate.SerializeToString,
-            showtime__pb2.MovieData.FromString,
+            showtime__pb2.MovieID.FromString,
             options,
             channel_credentials,
             insecure,
@@ -127,8 +128,8 @@ class ShowTime(object):
             request,
             target,
             '/ShowTime/GetSchedule',
-            showtime__pb2.Empty.SerializeToString,
-            showtime__pb2.TimeShow.FromString,
+            super__pb2.Empty.SerializeToString,
+            super__pb2.TimeShow.FromString,
             options,
             channel_credentials,
             insecure,
