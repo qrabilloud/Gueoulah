@@ -1,0 +1,10 @@
+syntax = "proto3";
+
+message Empty {
+
+}
+
+message TimeShow {
+    string date = 1;
+    repeated string movies = 2;
+}

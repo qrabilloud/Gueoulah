@@ -1,5 +1,7 @@
 syntax = "proto3";
 
+import "super.proto";
+
 service ShowTime {
     rpc GetMovieByDate(MovieDate) returns (MovieID) {}
     rpc GetSchedule(Empty) returns (stream TimeShow) {}
@@ -11,13 +13,4 @@ message MovieDate {
 
 message MovieID {
     repeated string movies = 1;
-}
-
-message TimeShow {
-    string date = 1;
-    repeated string movies = 2;
-}
-
-message Empty {
-
 }

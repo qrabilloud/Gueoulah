@@ -4,6 +4,7 @@ import grpc
 import warnings
 
 import booking_pb2 as booking__pb2
+import super_pb2 as super__pb2
 
 GRPC_GENERATED_VERSION = '1.66.1'
 GRPC_VERSION = grpc.__version__
@@ -41,12 +42,12 @@ class BookingStub(object):
                 _registered_method=True)
         self.GetBookings = channel.unary_stream(
                 '/Booking/GetBookings',
-                request_serializer=booking__pb2.Empty.SerializeToString,
+                request_serializer=super__pb2.Empty.SerializeToString,
                 response_deserializer=booking__pb2.BookingData.FromString,
                 _registered_method=True)
         self.AddBookingByUser = channel.unary_unary(
                 '/Booking/AddBookingByUser',
-                request_serializer=booking__pb2.UserID.SerializeToString,
+                request_serializer=booking__pb2.BookingData.SerializeToString,
                 response_deserializer=booking__pb2.BookingData.FromString,
                 _registered_method=True)
 
@@ -82,12 +83,12 @@ def add_BookingServicer_to_server(servicer, server):
             ),
             'GetBookings': grpc.unary_stream_rpc_method_handler(
                     servicer.GetBookings,
-                    request_deserializer=booking__pb2.Empty.FromString,
+                    request_deserializer=super__pb2.Empty.FromString,
                     response_serializer=booking__pb2.BookingData.SerializeToString,
             ),
             'AddBookingByUser': grpc.unary_unary_rpc_method_handler(
                     servicer.AddBookingByUser,
-                    request_deserializer=booking__pb2.UserID.FromString,
+                    request_deserializer=booking__pb2.BookingData.FromString,
                     response_serializer=booking__pb2.BookingData.SerializeToString,
             ),
     }
@@ -143,7 +144,7 @@ class Booking(object):
             request,
             target,
             '/Booking/GetBookings',
-            booking__pb2.Empty.SerializeToString,
+            super__pb2.Empty.SerializeToString,
             booking__pb2.BookingData.FromString,
             options,
             channel_credentials,
@@ -170,7 +171,7 @@ class Booking(object):
             request,
             target,
             '/Booking/AddBookingByUser',
-            booking__pb2.UserID.SerializeToString,
+            booking__pb2.BookingData.SerializeToString,
             booking__pb2.BookingData.FromString,
             options,
             channel_credentials,

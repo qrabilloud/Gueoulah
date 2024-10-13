@@ -11,9 +11,12 @@ class ShowTimeServicer(showtime_pb2_grpc.ShowTimeServicer):
             self.db = json.load(jsf)["schedule"]
     
     def GetSchedule(self, request, context):
+        """Gives a stream of dates with the associated list of movies, say the whole schedule."""
         for showtime in self.db:
             yield showtime_pb2.TimeShow(date=showtime['date'], movies=showtime['movies'])
     def GetMovieByDate(self, request, context):
+        """Takes a date in entry and returns all the movies scheduled for this date. Returns an
+        empty list if there are no movies for the date specified."""
         for showtime in self.db:
             if showtime['date'] == request.date:
                 return showtime_pb2.MovieID(movies=showtime['movies'])
