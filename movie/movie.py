@@ -8,15 +8,25 @@ HOST = '0.0.0.0'
 app = Flask(__name__)
 
 # todo create elements for Ariadne
-type_defs = load_schema_from_path('movie/movie.graphql')
+type_defs = load_schema_from_path('movie.graphql')
 query = QueryType()
-movie = ObjectType('Movie')
 query.set_field('movie_with_id', r.movie_with_id)
-schema = make_executable_schema(type_defs, movie, query)
+
+movie = ObjectType('Movie')
+movie.set_field('actors', r.resolve_actors_in_movie)
+
+actor = ObjectType('Actor')
+actor.set_field('films', r.resolve_movies_in_actor)
 
 mutation = MutationType()
 mutation.set_field('update_movie_rate', r.update_movie_rate)
-schema = make_executable_schema(type_defs, movie, query, mutation)
+mutation.set_field('create_movie', r.create_movie)
+mutation.set_field('delete_movie', r.delete_movie)
+mutation.set_field('create_actor', r.create_actor)
+mutation.set_field('delete_actor', r.delete_actor)
+mutation.set_field('add_actor_movie', r.add_actor_movie)
+mutation.set_field('delete_actor_movie', r.delete_actor_movie)
+schema = make_executable_schema(type_defs, movie, query, mutation, actor)
 
 # root message
 @app.route("/", methods=['GET'])
