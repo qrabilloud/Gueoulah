@@ -1,0 +1,454 @@
+---
+openapi: 3.0.3
+info:
+  title: User API
+  description: This is the API of the User service
+  contact:
+    email: helene.coullon@imt-atlantique.fr
+  license:
+    name: GPL v3
+    url: https://www.gnu.org/licenses/gpl-3.0.en.html
+  version: 1.0.0
+tags:
+- name: admins
+  description: Secured Admin-only calls
+- name: developers
+  description: Operations available to regular developers
+paths:
+  /:
+    get:
+      tags:
+      - developers
+      summary: home page of the service
+      description: home page of the service
+      operationId: home
+      responses:
+        "200":
+          description: welcome message
+          content:
+            text/html:
+              schema:
+                type: string
+                example: <h1 style='color:blue'>Welcome to the Showtime service!</h1>
+  /users:
+    get:
+      tags:
+      - developers
+      summary: get the full JSON database
+      description: get the full JSON database of users
+      operationId: get_all_users
+      responses:
+        "200":
+          description: full JSON
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AllUsers'
+    post:
+      tags:
+      - developers
+      summary: create a new user
+      description: create a new user using the request body
+      operationId: create_user
+      requestBody:
+        description: user to add
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+      responses:
+        "200":
+          description: User created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        "409":
+          description: an existing user already exists
+  /users/{userid}:
+    get:
+      tags:
+      - developers
+      summary: get the user by id
+      description: get the user having id <userid>
+      operationId: get_user_byid
+      parameters:
+      - name: id
+        in: path
+        description: ID of the user
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: A user
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        "400":
+          description: bad input parameter
+    put:
+      tags:
+      - developers
+      summary: update an user
+      description: update the user userid using the request body
+      operationId: update_user
+      parameters:
+      - name: id
+        in: path
+        description: ID of the user
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      requestBody:
+        description: new version of the user (id can be modified)
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+      responses:
+        "200":
+          description: User modified
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        "400":
+          description: Unexisting user
+        "409":
+          description: an existing user already exists
+    delete:
+      tags:
+      - developers
+      summary: delete an user
+      description: delete the user with id <userid>
+      operationId: delete_user
+      parameters:
+      - name: id
+        in: path
+        description: ID of the user
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Users deleted (empty if no user deleted)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AllUsers'
+  /users/name:
+    get:
+      tags:
+      - developers
+      summary: get users with name
+      description: get the users having the name name
+      operationId: get_users_byname
+      requestBody:
+        description: The body, which is the username
+        required: true
+        content:
+          text/plain:
+            schema:
+              type: string
+              example: nrabier
+      responses:
+        "200":
+          description: A table with all the user having this name (empty if no user with this name)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AllUsers'
+  /users/<userid>/bookings:
+    get:
+      tags:
+      - developers
+      summary: get user bookings
+      description: get the bookings of the user <userid>
+      operationId: get_booking_user
+      parameters:
+      - name: id
+        in: path
+        description: ID of the user
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: a table of bookings
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AllBookings"
+        "400":
+          description: Unexisting user or an error occured when retrieving the data of a movie
+  /users/<userid>/bookings/details:
+    get:
+      tags:
+      - developers
+      summary: get detailed user bookings
+      description: get the detailed bookings of the user <userid>
+      operationId: get_detailed_booking_user
+      parameters:
+      - name: id
+        in: path
+        description: ID of the user
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: a table of detailed bookings
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AllBookingsDetailed"
+  /users/<userid>/book:
+    post:
+      tags:
+        - developers
+      summary: Create a booking
+      description: Create a booking for the user userid, using the request body
+      operationId: create_or_delete_booking_for_user
+      parameters:
+      - name: id
+        in: path
+        description: ID of the user
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      requestBody:
+        description: The body, a json with the movieId and the date
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/newBook"
+      responses:
+        "200":
+          description: All the bookings of the user
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AllBookings"
+        "409":
+          description: Issue with the input data (userid, date and/or movieId)
+    delete:
+      tags:
+        - developers
+      summary: Delete a booking
+      description: Delete a booking of the user userid, using the request body
+      operationId: create_or_delete_booking_for_user
+      parameters:
+      - name: id
+        in: path
+        description: ID of the user
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      requestBody:
+        description: The body, a json with the movieId and the date
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/newBook"
+      responses:
+        "200":
+          description: All the bookings of the user
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AllBookings"
+        "409":
+          description: Issue with the input data (userid, date and/or movieId)
+  /users/<userid>/bookMovie:
+    post:
+      tags:
+        - developers
+      summary: Create a booking using title
+      description: Create a booking for the user userid, using the request body, with the title of the movie
+      operationId: create_or_delete_booking_for_user_with_title
+      parameters:
+      - name: id
+        in: path
+        description: ID of the user
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      requestBody:
+        description: The body, a json with the title of the movie and the date
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/newBookTitle"
+      responses:
+        "200":
+          description: All the bookings of the user
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AllBookings"
+        "409":
+          description: Issue with the input data (userid, date and/or movieId)
+    delete:
+      tags:
+        - developers
+      summary: Delete a booking using title
+      description: Delete a booking of the user userid, using the request body, with the title of the movie
+      operationId: create_or_delete_booking_for_user_with_title
+      parameters:
+      - name: id
+        in: path
+        description: ID of the user
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      requestBody:
+        description: The body, a json with the title of the movie and the date
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/newBookTitle"
+      responses:
+        "200":
+          description: All the bookings of the user
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AllBookings"
+        "409":
+          description: Issue with the input data (userid, date and/or movieId)
+components:
+  schemas:
+    AllUsers:
+      required:
+      - users
+      type: object
+      properties:
+        users:
+          type: array
+          items:
+            $ref: '#/components/schemas/User'
+    User:
+      required:
+      - id
+      - name
+      type: object
+      properties:
+        id:
+          type: string
+          example: "bertrand_lentsch"
+        name:
+          type: string
+          example: "Bertrand Lentsch"
+    AllBookings:
+      required:
+      - bookings
+      type: object
+      properties:
+        bookings:
+          type: array
+          items:
+            $ref: "#/components/schemas/booking"
+    booking:
+      required:
+        - date
+        - movies
+      type: object
+      properties:
+        date:
+          type: string
+          example : "20151201"
+        movies:
+          type: array
+          items:
+            type: string
+            example: 96798c08-d19b-4986-a05d-7da856efb697
+    AllBookingsDetailed:
+      required:
+      - bookings
+      type: object
+      properties:
+        bookings:
+          type: array
+          items:
+            $ref: "#/components/schemas/booking"
+    bookingDetailed:
+      required:
+        - date
+        - movies
+      type: object
+      properties:
+        date:
+          type: string
+          example : "20151201"
+        movies:
+          type: array
+          items:
+            $ref: "#/components/schemas/movieDetailed"
+    movieDetailed:
+      required:
+        - title
+        - rating
+        - director
+        - id
+      type: object
+      properties:
+        title:
+          type: string
+          example: The Good Dinosaur
+        rating:
+          type: number
+          example: 7.4
+        director:
+          type: string
+          example: Peter Sohn
+        id:
+          type: string
+          example: 720d006c-3a57-4b6a-b18f-9b713b073f3c
+    newBook:
+      required:
+        - movie
+        - date
+      type: object
+      properties:
+        movie:
+          type: string
+          example: 267eedb8-0f5d-42d5-8f43-72426b9fb3e6
+        date:
+          type: string
+          example: "20151201"
+    newBookTitle:
+      required:
+        - movieTitle
+        - date
+      type: object
+      properties:
+        movieTitle:
+          type: string
+          example: The Good Dinausaur
+        date:
+          type: string
+          example: "20151201"

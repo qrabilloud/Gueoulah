@@ -25,6 +25,7 @@ def syncActorMovie():
 def writeAsJson(filePath, data):
     with open(filePath.format("."), "w") as wfile:
         json.dump(data, wfile)
+        wfile.close()
 
 def writeMovies(movies):
     return writeAsJson('{}/data/movies.json', movies)
@@ -35,6 +36,7 @@ def writeActors(actors):
 def readAsJson(filePath):
     with open(filePath.format("."), "r") as rfile:
         jsonData = json.load(rfile)
+        rfile.close()
         return jsonData
 
 def readMovies():
@@ -79,7 +81,7 @@ def resolve_movies_in_actor(actor, info):
 def update_movie_rate(_,info,_id,_rate):
     movies = readMovies()
     movie = getObjFromListAttr(movies['movies'], 'id', _id)
-    if not movie : raise GraphQLError('Unexisting movie')
+    if not movie : raise GraphQLError('Unexisting movie ' + _id)
     movie['rating'] = _rate
     writeMovies(movies)
     return movie
@@ -89,7 +91,7 @@ def create_movie(_, info, _id, _title, _director, _rate, _actors):
     movies = readMovies()
     if getObjFromListAttr(movies['movies'], 'id', _id): raise GraphQLError('id already used')
     actors = readActors()
-    actorsPlaying = getListActors(_actors, actors, True)
+    actorsPlaying = getListActors(_actors, actors['actors'], True)
     for actor in actorsPlaying:
         actor['films'].append(_id)
     movies['movies'].append(movie)
@@ -114,9 +116,9 @@ def delete_movie(_, info, _id):
     writeMovies(movies)
     return movieDeleted
 
-def create_actor(_, info, _id, _firstName, _lastName, _birthyear, _films):
+def create_actor(_, info, _id, _firstname, _lastname, _birthyear, _films):
     print("Create !!!!!!")
-    actor = {'id': _id, 'firstname': _firstName, 'lastname': _lastName, 'birthyear': _birthyear, 'films': _films}
+    actor = {'id': _id, 'firstname': _firstname, 'lastname': _lastname, 'birthyear': _birthyear, 'films': _films}
     actors = readActors()
     if getObjFromListAttr(actors['actors'], 'id', _id) : raise GraphQLError('id already used')
     movies = readMovies()
@@ -145,6 +147,9 @@ def delete_actor(_, info, _id):
     writeMovies(movies)
     writeActors(actors)
     return delActor
+
+def actor_with_id(_, info, _id):
+    return getObjFromListAttr(readActors()['actors'], 'id', _id)
 
 def add_actor_movie(_, info, _idMovie, _idActor):
     movies = readMovies()
