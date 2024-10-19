@@ -42,14 +42,18 @@ class BookingServicer(booking_pb2_grpc.BookingServicer):
                 return booking_pb2.Bookings(bookings=[booking_pb2.BookingData(userid=booking['userid'], date=super_pb2.TimeShow(date=showtime['date'], movies=showtime['movies'])) for showtime in booking['dates']])
         print("This user does not have any bookings yet.")
         return booking_pb2.Bookings(bookings=[])
+    
+    def _bookingsByUser(self, userid):
+        return [userBookings['dates'] for userBookings in self.db if userBookings['userid'] == userid][0]
+    
     def AddBookingByUser(self, request, context):
         """Adds a booking for an already existing user."""
         print("Beginning of the call")
         moviesOnRequestedDate = [show.movies for show in self.getPlannedMovies().schedule if show.date == request.date.date][0]
         availableMovies = [wantedMovie for wantedMovie in request.date.movies if wantedMovie in moviesOnRequestedDate]
         print(availableMovies)
-        userBookings = [booking['dates'] for booking in self.db if booking['userid'] == request.userid]
-        print(userBookings)
+        userBookingsForRequestedDate = [booking['movies'] for booking in self._bookingsByUser(request.userid) if booking['date'] == request.date.date][0]
+        print(userBookingsForRequestedDate)
         return super_pb2.Empty()
     
 def serve():
