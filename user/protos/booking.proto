@@ -1,31 +1,22 @@
 syntax = "proto3";
 
+import "super.proto";
+
 service Booking {
-    rpc GetBookingsByUser(UserID) returns (stream BookingData) {}
-    rpc GetBookings(Empty) returns (stream BookingData) {}
-    rpc AddBookingByUser(UserID) returns (BookingData) {}
+    rpc GetBookingsByUser(UserID) returns (Bookings) {}
+    rpc GetBookings(Empty) returns (Bookings) {}
+    rpc AddBookingByUser(BookingData) returns (Empty) {}
 }
 
 message UserID {
     string userid = 1;
 }
 
+message Bookings {
+    repeated BookingData bookings = 1;
+}
+
 message BookingData {
     string userid = 1;
-    repeated ShowTime dates = 2;
-    string id = 3;
-}
-
-message ShowTime {
-    string id = 1;
-    string date = 2;
-    repeated string movies = 3;
-}
-
-message User {
-    string userid = 1;
-}
-
-message Empty {
-
+    TimeShow date = 2;
 }

@@ -40,10 +40,10 @@ class ShowTimeStub(object):
                 request_serializer=showtime__pb2.MovieDate.SerializeToString,
                 response_deserializer=showtime__pb2.MovieID.FromString,
                 _registered_method=True)
-        self.GetSchedule = channel.unary_stream(
+        self.GetSchedule = channel.unary_unary(
                 '/ShowTime/GetSchedule',
                 request_serializer=super__pb2.Empty.SerializeToString,
-                response_deserializer=super__pb2.TimeShow.FromString,
+                response_deserializer=showtime__pb2.Schedule.FromString,
                 _registered_method=True)
 
 
@@ -70,10 +70,10 @@ def add_ShowTimeServicer_to_server(servicer, server):
                     request_deserializer=showtime__pb2.MovieDate.FromString,
                     response_serializer=showtime__pb2.MovieID.SerializeToString,
             ),
-            'GetSchedule': grpc.unary_stream_rpc_method_handler(
+            'GetSchedule': grpc.unary_unary_rpc_method_handler(
                     servicer.GetSchedule,
                     request_deserializer=super__pb2.Empty.FromString,
-                    response_serializer=super__pb2.TimeShow.SerializeToString,
+                    response_serializer=showtime__pb2.Schedule.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -124,12 +124,12 @@ class ShowTime(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_stream(
+        return grpc.experimental.unary_unary(
             request,
             target,
             '/ShowTime/GetSchedule',
             super__pb2.Empty.SerializeToString,
-            super__pb2.TimeShow.FromString,
+            showtime__pb2.Schedule.FromString,
             options,
             channel_credentials,
             insecure,
