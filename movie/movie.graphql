@@ -1,5 +1,7 @@
 type Query {
+    all_movies: [Movie]
     movie_with_id(_id: String!): Movie
+    all_actors: [Actor]
     actor_with_id(_id: String!): Actor
 }
 

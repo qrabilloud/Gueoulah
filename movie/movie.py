@@ -10,7 +10,9 @@ app = Flask(__name__)
 # todo create elements for Ariadne
 type_defs = load_schema_from_path('movie.graphql')
 query = QueryType()
+query.set_field('all_movies', r.all_movies)
 query.set_field('movie_with_id', r.movie_with_id)
+query.set_field('all_actors', r.all_actors)
 query.set_field('actor_with_id', r.actor_with_id)
 
 movie = ObjectType('Movie')

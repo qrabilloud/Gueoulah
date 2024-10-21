@@ -213,7 +213,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/AllBookingsDetailed"
+                $ref: "#/components/schemas/allBookingsDetailed"
   /users/<userid>/book:
     post:
       tags:
@@ -316,7 +316,7 @@ paths:
       description: Delete a booking of the user userid, using the request body, with the title of the movie
       operationId: create_or_delete_booking_for_user_with_title
       parameters:
-      - name: id
+      - name: userid
         in: path
         description: ID of the user
         required: true
@@ -340,6 +340,326 @@ paths:
                 $ref: "#/components/schemas/AllBookings"
         "409":
           description: Issue with the input data (userid, date and/or movieId)
+  /movies:
+    get:
+      tags:
+        - developers
+      summary: get all the movies
+      description: get all the movies that are in the database
+      operationId: get_all_movies
+      responses:
+        "200":
+          description: All the detailed movies
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/allMoviesDetailed"
+    post:
+      tags:
+        - admins
+      summary: Create a movie
+      description: Create a movie using the body of the request
+      operationId: create_movie
+      requestBody:
+        description: The body, containing the informations for the movie
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/movieWithActorId"
+      responses:
+        "200":
+          description: The created movie
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/movieDetailed"
+        "400":
+          description: Wrong arguments (ID already used, unexisting actor ...)
+          content:
+            text/plain:
+              example: id already used
+  /movies/<id>:
+    get:
+      tags:
+      - developers
+      summary: Get a movie
+      description: Get a movie by it's id
+      operationId: get_movie_byId
+      parameters:
+      - name: id
+        in: path
+        description: ID of the movie
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: The corresponding movie
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/movieDetailed"
+        "400":
+            description: Unknow id
+            content:
+              text/plain:
+                example: Unknow id
+    delete:
+      tags:
+        - admins
+      summary: Delete a movie
+      description: Delete a movie by it's id
+      operationId: delete_movie
+      parameters:
+      - name: id
+        in: path
+        description: ID of the movie
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: The deleted movie (empty json if the id is unknow)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/movieDetailed"
+  /actors:
+    get:
+      tags:
+        - developers
+      summary: Get all the actors
+      description: Get all the actors in the database
+      operationId: get_all_actors
+      responses:
+        "200":
+          description: All the actors
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/allActorsDetailed"
+    post:
+      tags:
+        - admins
+      summary: Create a movie.
+      description: Create an actor using the body of the request.
+      operationId: create_actor
+      requestBody:
+        description: The body, containing the informations for the actor
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/actorWithMovieId"
+      responses:
+        "200":
+          description: The created actor
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/actorDetailed"
+        "400":
+          description: Wrong arguments (ID already used, unexisting movie ...)
+          content:
+            text/plain:
+              example: id already used
+  /actors/<id>:
+    get:
+      tags:
+        - developers
+      summary: Get a movie
+      description: Get a movie by it's id
+      operationId: get_actor_with_id
+      parameters:
+      - name: id
+        in: path
+        description: ID of the actor
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: The actor
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/actorDetailed"
+        "400":
+          description: Unknow id
+          content:
+            text/plain:
+              example: Unknow id
+    delete:
+      tags:
+        - admins
+      summary: Delete the movie
+      description: Delete the movie having the id id
+      operationId: delete_actor
+      parameters:
+      - name: id
+        in: path
+        description: ID of the actor
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: The deleted actor
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/actorDetailed"
+  /movies/<idMovie>/<idActor>:
+    put:
+      tags:
+        - admins
+      summary: Add an actor to a movie
+      description: Add an actor to a movie (and the movie to the actor)
+      operationId: add_actor_movie
+      parameters:
+      - name: idMovie
+        in: path
+        description: ID of the movie
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: idActor
+        in: path
+        description: ID of the actor
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: The movie having the id idMovie
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/movieDetailed"
+        "400":
+          description: Wrong parameters (unexisting id or actor already in the movie)
+          content:
+            text/plain:
+              example: Unknow idMovie
+    delete:
+      tags:
+        - admins
+      summary: Remove an actor from a movie
+      description: Remove an actor from a movie (and the movie to the actor)
+      operationId: delete_actor_movie
+      parameters:
+      - name: idMovie
+        in: path
+        description: ID of the movie
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: idActor
+        in: path
+        description: ID of the actor
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: The movie having the id idMovie
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/movieDetailed"
+        "400":
+          description: Wrong parameters (unexisting id or actor not in the movie)
+          content:
+            text/plain:
+              example: Unknow idMovie
+  /actors/<idActor>/<idMovie>:
+    put:
+      tags:
+        - admins
+      summary: Add a movie to an actor
+      description: Add a movie to an actor (and the actor to the movie)
+      operationId: add_movie_actor
+      parameters:
+      - name: idMovie
+        in: path
+        description: ID of the movie
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: idActor
+        in: path
+        description: ID of the actor
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: The movie having the id idMovie
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/movieDetailed"
+        "400":
+          description: Wrong parameters (unexisting id or actor already in the movie)
+          content:
+            text/plain:
+              example: Unknow idMovie
+    delete:
+      tags:
+        - admins
+      summary: Remove a movie to an actor
+      description: Remove a movie to an actor (and the actor from the movie)
+      operationId: delete_movie_actor
+      parameters:
+      - name: idMovie
+        in: path
+        description: ID of the movie
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: idActor
+        in: path
+        description: ID of the actor
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: The movie having the id idMovie
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/movieDetailed"
+        "400":
+          description: Wrong parameters (unexisting id or actor not in the movie)
+          content:
+            text/plain:
+              example: Unknow idMovie
 components:
   schemas:
     AllUsers:
@@ -386,48 +706,6 @@ components:
           items:
             type: string
             example: 96798c08-d19b-4986-a05d-7da856efb697
-    AllBookingsDetailed:
-      required:
-      - bookings
-      type: object
-      properties:
-        bookings:
-          type: array
-          items:
-            $ref: "#/components/schemas/booking"
-    bookingDetailed:
-      required:
-        - date
-        - movies
-      type: object
-      properties:
-        date:
-          type: string
-          example : "20151201"
-        movies:
-          type: array
-          items:
-            $ref: "#/components/schemas/movieDetailed"
-    movieDetailed:
-      required:
-        - title
-        - rating
-        - director
-        - id
-      type: object
-      properties:
-        title:
-          type: string
-          example: The Good Dinosaur
-        rating:
-          type: number
-          example: 7.4
-        director:
-          type: string
-          example: Peter Sohn
-        id:
-          type: string
-          example: 720d006c-3a57-4b6a-b18f-9b713b073f3c
     newBook:
       required:
         - movie
@@ -452,3 +730,166 @@ components:
         date:
           type: string
           example: "20151201"
+    allBookingsDetailed:
+      required:
+      - bookings
+      type: object
+      properties:
+        bookings:
+          type: array
+          items:
+            $ref: "#/components/schemas/booking"
+    bookingDetailed:
+      required:
+        - date
+        - movies
+      type: object
+      properties:
+        date:
+          type: string
+          example : "20151201"
+        movies:
+          type: array
+          items:
+            $ref: "#/components/schemas/movieDetailed"
+    allMoviesDetailed:
+      type: array
+      properties:
+        items:
+          $ref: "#/components/schemas/movieDetailed"
+    movieDetailed:
+      required:
+        - title
+        - rating
+        - director
+        - id
+        - actors
+      type: object
+      properties:
+        title:
+          type: string
+          example: The Good Dinosaur
+        rating:
+          type: number
+          example: 7.4
+        director:
+          type: string
+          example: Peter Sohn
+        id:
+          type: string
+          example: 720d006c-3a57-4b6a-b18f-9b713b073f3c
+        actors:
+          type: array
+          items:
+            $ref: "#/components/schemas/actor"
+    movie:
+      required:
+        - title
+        - rating
+        - director
+        - id
+      type: object
+      properties:
+        title:
+          type: string
+          example: The Good Dinosaur
+        rating:
+          type: number
+          example: 7.4
+        director:
+          type: string
+          example: Peter Sohn
+        id:
+          type: string
+          example: 720d006c-3a57-4b6a-b18f-9b713b073f3c
+    movieWithActorId:
+      required:
+        - title
+        - rating
+        - director
+        - id
+        - actors
+      type: object
+      properties:
+        title:
+          type: string
+          example: The Good Dinosaur
+        rating:
+          type: number
+          example: 7.4
+        director:
+          type: string
+          example: Peter Sohn
+        id:
+          type: string
+          example: 720d006c-3a57-4b6a-b18f-9b713b073f3c
+        actors:
+          type: array
+          items:
+            type: string
+    allActorsDetailed:
+      type: array
+      properties:
+        items:
+          $ref: "#/components/schemas/actorDetailed"
+    actorDetailed:
+      required:
+        - firstname
+        - lastname
+        - birthyear
+        - id
+        - movies
+      type: object
+      properties:
+        firstname:
+          type: string
+          example: "Bertrand"
+        lastname:
+          type: string
+          example: "Lentsch"
+        birthyear:
+          type: integer
+          example: 1875
+        movies:
+          type: array
+          items:
+            $ref: "#/components/schemas/movie"
+    actor:
+      required:
+        - firstname
+        - lastname
+        - birthyear
+        - id
+      type: object
+      properties:
+        firstname:
+          type: string
+          example: "Bertrand"
+        lastname:
+          type: string
+          example: "Lentsch"
+        birthyear:
+          type: integer
+          example: 1875
+    actorWithMovieId:
+      required:
+        - firstname
+        - lastname
+        - birthyear
+        - id
+        - movies
+      type: object
+      properties:
+        firstname:
+          type: string
+          example: "Bertrand"
+        lastname:
+          type: string
+          example: "Lentsch"
+        birthyear:
+          type: integer
+          example: 1875
+        movies:
+          type: array
+          items:
+            type: string

@@ -104,6 +104,13 @@ def makeResponseMovie(respMovie, function, messageNoData = None):
    if res == None : return make_response(messageNoData if messageNoData else "", 400 if messageNoData else 200)
    return make_response(res, 200)
 
+@app.route("/movies", methods=['GET'])
+def get_all_movies() -> str:
+   """Get all the movies in the database"""
+   reqMovie = {"query": "query {all_movies {id, title, director, rating, actors{firstname, lastname, birthyear, id}}}"}
+   respMovie = requests.post("http://127.0.0.1:3001/graphql", json=reqMovie)
+   return makeResponseMovie(respMovie, "all_movies")
+
 @app.route("/movies/<id>", methods=['GET'])
 def get_movie_byId(id : str) -> str:
    """Get the movie having this id"""
@@ -130,6 +137,13 @@ def delete_movie(id: str) -> str:
    respMovie = requests.post("http://127.0.0.1:3001/graphql", json = reqMovie)
    return makeResponseMovie(respMovie, "delete_movie")
 
+@app.route("/actors", methods=['GET'])
+def get_all_actors() -> str:
+   """Get all the actors in the database"""
+   reqMovie = {"query": "query {all_actors {id, firstname, lastname, birthyear, films{id, title, director, rating}}}"}
+   respMovie = requests.post("http://127.0.0.1:3001/graphql", json = reqMovie)
+   return makeResponseMovie(respMovie, "all_actors")
+
 @app.route("/actors/<id>", methods=['GET'])
 def get_actor_with_id(id : str) -> str:
    """Get the actor having this id"""
@@ -148,7 +162,7 @@ def create_actor() -> str:
    return makeResponseMovie(respMovie, "create_actor")
 
 @app.route("/actors/<id>", methods=['DELETE'])
-def delete_actors(id: str) -> str:
+def delete_actor(id: str) -> str:
    """Delete an actor (using his id)"""
    reqMovie = {"query": "mutation ($_id:String!) {delete_actor(_id: $_id) {id, firstname, lastname, birthyear, films{id, title, director, rating}}}",
                "variables": {"_id":id}}
