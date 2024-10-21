@@ -10,8 +10,7 @@ import json
 class BookingServicer(booking_pb2_grpc.BookingServicer):
 
     def __init__(self):
-        with open('{}/data/bookings.json'.format("."), "r") as jsf:
-            self.db = json.load(jsf)["bookings"]
+        self.update()
 
     def getPlannedMovies(self):
         with grpc.insecure_channel('localhost:3002') as channel:
@@ -23,12 +22,17 @@ class BookingServicer(booking_pb2_grpc.BookingServicer):
         channel.close()
         return schedule
 
+    def update(self):
+        with open('{}/data/bookings.json'.format("."), "r") as jsf:
+            self.db = json.load(jsf)["bookings"]
+
     def write(self):
         with open('{}/data/bookings.json'.format("."), 'w') as f:
             json.dump({"bookings" : self.db}, f)
 
     def GetBookings(self, request, context):
         """Gives a list of users with the associated bookings, say all the current bookings."""
+        self.update()
         result = []
         for booking in self.db:
             for showtime in booking['dates']:
@@ -36,6 +40,7 @@ class BookingServicer(booking_pb2_grpc.BookingServicer):
         return booking_pb2.Bookings(bookings=result)
         
     def GetBookingsByUser(self, request, context):
+        self.update()
         """Gives a stream of bookings for a given user."""
         for booking in self.db:
             if booking['userid'] == request.userid:
@@ -47,13 +52,19 @@ class BookingServicer(booking_pb2_grpc.BookingServicer):
         return [userBookings['dates'] for userBookings in self.db if userBookings['userid'] == userid][0]
     
     def AddBookingByUser(self, request, context):
+        self.update()
         """Adds a booking for an already existing user."""
-        print("Beginning of the call")
         moviesOnRequestedDate = [show.movies for show in self.getPlannedMovies().schedule if show.date == request.date.date][0]
         availableMovies = [wantedMovie for wantedMovie in request.date.movies if wantedMovie in moviesOnRequestedDate]
-        print(availableMovies)
         userBookingsForRequestedDate = [booking['movies'] for booking in self._bookingsByUser(request.userid) if booking['date'] == request.date.date][0]
-        print(userBookingsForRequestedDate)
+        moviesToBook = [movie for movie in availableMovies if movie not in userBookingsForRequestedDate]
+        for user in self.db:
+            if user['userid'] == request.userid:
+                for booking in user['dates']:
+                    if booking['date'] == request.date.date:
+                        for movie in moviesToBook:
+                            booking['movies'].append(movie)
+        self.write()
         return super_pb2.Empty()
     
 def serve():
