@@ -4,7 +4,11 @@ import "super.proto";
 
 service ShowTime {
     rpc GetMovieByDate(MovieDate) returns (MovieID) {}
-    rpc GetSchedule(Empty) returns (stream TimeShow) {}
+    rpc GetSchedule(Empty) returns (Schedule) {}
+}
+
+message Schedule {
+    repeated TimeShow schedule = 1;
 }
 
 message MovieDate {

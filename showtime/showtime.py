@@ -2,6 +2,7 @@ import grpc
 from concurrent import futures
 import showtime_pb2
 import showtime_pb2_grpc
+import super_pb2
 import json
 
 class ShowTimeServicer(showtime_pb2_grpc.ShowTimeServicer):
@@ -12,8 +13,7 @@ class ShowTimeServicer(showtime_pb2_grpc.ShowTimeServicer):
     
     def GetSchedule(self, request, context):
         """Gives a stream of dates with the associated list of movies, say the whole schedule."""
-        for showtime in self.db:
-            yield showtime_pb2.TimeShow(date=showtime['date'], movies=showtime['movies'])
+        return showtime_pb2.Schedule(schedule=[super_pb2.TimeShow(date=showtime['date'], movies=showtime['movies']) for showtime in self.db])
     def GetMovieByDate(self, request, context):
         """Takes a date in entry and returns all the movies scheduled for this date. Returns an
         empty list if there are no movies for the date specified."""

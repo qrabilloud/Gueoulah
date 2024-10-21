@@ -196,12 +196,17 @@ def delete_movie_actor(idActor: str, idMovie: str) -> str:
    return delete_actor_movie(idMovie, idActor)
 
 
-#@app.route("/users/<userid>/bookings", methods = ['GET'])
-#def get_booking_user(userid : str) -> str:
-#   """Searches all the bookings of an user in the database"""
-#   if not isUserExisting(userid) : return make_response("Unexisting user", 400)
-#   reqBook = requests.get("http://127.0.0.1:3201/bookings/" + userid)
-#   return make_response(reqBook.content, reqBook.status_code)
+@app.route("/users/<userid>/bookings", methods = ['GET'])
+def get_booking_user(userid : str) -> str:
+   """Searches all the bookings of an user in the database"""
+   with grpc.insecure_channel('localhost:3003') as channel:
+      stub = booking_pb2_grpc.BookingStub(channel)
+      print("-------------- GetBookingByUser --------------")
+      bookings = stub.GetBookingsByUser(booking_pb2.UserID(userid=userid))
+   channel.close()
+   for booking in bookings:
+      print(booking)
+   return make_response(bookings, 200)
 
 #@app.route("/users/<userid>/bookings/details", methods = ['GET'])
 #def get_detailed_booking_user(userid : str) -> str:
