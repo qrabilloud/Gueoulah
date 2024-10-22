@@ -193,6 +193,10 @@ def delete_movie_actor(idActor: str, idMovie: str) -> str:
    """Delete a movie in an actor (and the actor in the movie)"""
    return delete_actor_movie(idMovie, idActor)
 
+def groupByUser(userid : str, bookings):
+   groupedBookings = []
+   for booking in bookings:
+      
 
 @app.route("/users/<userid>/bookings", methods = ['GET'])
 def get_booking_user(userid : str) -> str:
@@ -204,9 +208,9 @@ def get_booking_user(userid : str) -> str:
       bookings = stub.GetBookingsByUser(booking_pb2.UserID(userid=userid)).bookings
       print("Everything is going great.")
    channel.close()
-   convertedBookings = {'bookings' : [{'userid' : booking.userid, 'date' : booking.date.date, 'movies' : booking.date.movies } for booking in bookings]}
+   convertedBookings = [{'userid' : booking.userid, 'date' : booking.date.date, 'movies' : list(booking.date.movies) } for booking in bookings]
    print(convertedBookings)
-   return make_response(convertedBookings, 200)
+   return make_response(jsonify(convertedBookings), 200)
 
 #@app.route("/users/<userid>/bookings/details", methods = ['GET'])
 #def get_detailed_booking_user(userid : str) -> str:
