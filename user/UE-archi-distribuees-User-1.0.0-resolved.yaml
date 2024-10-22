@@ -738,7 +738,7 @@ components:
         bookings:
           type: array
           items:
-            $ref: "#/components/schemas/booking"
+            $ref: "#/components/schemas/bookingDetailed"
     bookingDetailed:
       required:
         - date

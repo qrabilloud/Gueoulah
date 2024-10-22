@@ -193,10 +193,23 @@ def delete_movie_actor(idActor: str, idMovie: str) -> str:
    """Delete a movie in an actor (and the actor in the movie)"""
    return delete_actor_movie(idMovie, idActor)
 
-def groupByUser(userid : str, bookings):
+def getObjFromListAttr(list, attr, val):
+   """Get the object in the list list having it's attribute attr equal to val. Return None otherwise"""
+   for l in list:
+      if l[attr] == val:
+         return l
+   return None
+
+def groupByUser(bookings):
+   """Group the bookings (where the user is precised in each booking) by users"""
    groupedBookings = []
    for booking in bookings:
-      
+      user = getObjFromListAttr(groupedBookings, 'userid', booking['userid'])
+      if not user:
+         user = {'userid' : booking['userid'], 'bookings' : []}
+         groupedBookings.append(user)
+      user['bookings'].append({'date' : booking['date'], 'movies' : booking['movies']})
+   return groupedBookings
 
 @app.route("/users/<userid>/bookings", methods = ['GET'])
 def get_booking_user(userid : str) -> str:
@@ -209,21 +222,36 @@ def get_booking_user(userid : str) -> str:
       print("Everything is going great.")
    channel.close()
    convertedBookings = [{'userid' : booking.userid, 'date' : booking.date.date, 'movies' : list(booking.date.movies) } for booking in bookings]
-   print(convertedBookings)
-   return make_response(jsonify(convertedBookings), 200)
+   if not convertedBookings : return make_response({'dates' : []}, 200)
+   userBookings = groupByUser(convertedBookings)[0]['bookings']
+   return make_response(jsonify({'dates' : userBookings}), 200)
 
-#@app.route("/users/<userid>/bookings/details", methods = ['GET'])
-#def get_detailed_booking_user(userid : str) -> str:
+@app.route("/users/<userid>/bookings/details", methods = ['GET'])
+def get_detailed_booking_user(userid : str) -> str:
    """Searches all the bookings of an user in the database, and show all the details for each movie"""
    if not isUserExisting(userid) : return make_response("Unexisting user", 400)
-   reqBook = requests.get("http://127.0.0.1:3201/bookings/" + userid)
-   books = reqBook.json()
+   with grpc.insecure_channel('localhost:3003') as channel:
+      stub = booking_pb2_grpc.BookingStub(channel)
+      print(stub)
+      print("-------------- GetBookingByUser --------------")
+      bookings = stub.GetBookingsByUser(booking_pb2.UserID(userid=userid)).bookings
+      print("Everything is going great.")
+   channel.close()
+   convertedBookings = [{'userid' : booking.userid, 'date' : booking.date.date, 'movies' : list(booking.date.movies) } for booking in bookings]
+   if not convertedBookings : return make_response({'bookings' : []}, 200)
+   userBookings = groupByUser(convertedBookings)[0]['bookings']
+   books = {'dates' : userBookings}
+   #Here we got the bookings of the user, now we got the data of the movies
    for date in books['dates']:
       detailedMovies = []
       for movie in date['movies']:
-         reqMovie = requests.get("http://127.0.0.1:3200/movies/" + movie)
-         if reqMovie.status_code != 200 : return make_response("An issue occured when retrieving a movie data : " + reqMovie.content, 400)
-         detailedMovies.append(reqMovie.json())
+         reqMovie = {"query": "query ($_id:String!) {movie_with_id(_id: $_id) {id, title, director, rating, actors{firstname, lastname, birthyear, id}}}",
+               "variables": {"_id":movie}}
+         respMovie = requests.post("http://127.0.0.1:3001/graphql", json = reqMovie)
+         if respMovie.status_code != 200 : return make_response("An issue occured when retrieving a movie data : " + respMovie.content, 500)
+         respJson = respMovie.json()
+         if 'errors' in respJson : return make_response(respJson, 400)
+         detailedMovies.append(respJson['data']['movie_with_id'])
       date['movies'] = detailedMovies
    return make_response(books, 200)
 
