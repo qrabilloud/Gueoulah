@@ -6,6 +6,7 @@ service Booking {
     rpc GetBookingsByUser(UserID) returns (Bookings) {}
     rpc GetBookings(Empty) returns (Bookings) {}
     rpc AddBookingByUser(BookingData) returns (Empty) {}
+    rpc DeleteBookingByUser(BookingData) returns (Empty) {}
 }
 
 message UserID {

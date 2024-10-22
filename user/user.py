@@ -9,6 +9,7 @@ import grpc
 from concurrent import futures
 import booking_pb2
 import booking_pb2_grpc
+import super_pb2
 
 # CALLING GraphQL requests
 # todo to complete
@@ -219,7 +220,6 @@ def get_booking_user(userid : str) -> str:
       print(stub)
       print("-------------- GetBookingByUser --------------")
       bookings = stub.GetBookingsByUser(booking_pb2.UserID(userid=userid)).bookings
-      print("Everything is going great.")
    channel.close()
    convertedBookings = [{'userid' : booking.userid, 'date' : booking.date.date, 'movies' : list(booking.date.movies) } for booking in bookings]
    if not convertedBookings : return make_response({'dates' : []}, 200)
@@ -235,7 +235,6 @@ def get_detailed_booking_user(userid : str) -> str:
       print(stub)
       print("-------------- GetBookingByUser --------------")
       bookings = stub.GetBookingsByUser(booking_pb2.UserID(userid=userid)).bookings
-      print("Everything is going great.")
    channel.close()
    convertedBookings = [{'userid' : booking.userid, 'date' : booking.date.date, 'movies' : list(booking.date.movies) } for booking in bookings]
    if not convertedBookings : return make_response({'bookings' : []}, 200)
@@ -255,27 +254,24 @@ def get_detailed_booking_user(userid : str) -> str:
       date['movies'] = detailedMovies
    return make_response(books, 200)
 
-#@app.route("/users/<userid>/book", methods = ['POST', 'DELETE'])
-#def create_or_delete_booking_for_user(userid : str) -> str:
+@app.route("/users/<userid>/book", methods = ['POST', 'DELETE'])
+def create_or_delete_booking_for_user(userid : str) -> str:
    """Create or delete a booking for the user userid"""
    req = request.get_json()
    if not isUserExisting(userid) : return make_response("Unexisting user", 409)
-   reqBook = requests.request(request.method ,"http://127.0.0.1:3201/bookings/" + userid, json = req)
-   if reqBook.status_code != 200 : return make_response(reqBook.content, 409)
-   return make_response(reqBook.content, 200)
-
-#@app.route("/users/<userid>/bookMovie", methods = ['POST', 'DELETE'])
-#def create_or_delete_booking_for_user_with_title(userid : str) -> str:
-   """Create or delete a booking for the user userid using the title of the movie"""
-   req = request.get_json()
-   reqMovie = requests.get("http://127.0.0.1:3200/movies/title", data=req["movieTitle"])
-   if reqMovie.status_code != 200 : return make_response(reqMovie.content, 409)
-   reqMovieJson = reqMovie.json()
-   if len(reqMovieJson) == 0: return make_response("Movie not found", 409)
-   jsonReqBook = {"movie" : reqMovieJson[0]["id"], "date" : req["date"]}
-   reqBook = requests.request(request.method,"http://127.0.0.1:3203/users/" + userid + "/book", json= jsonReqBook)
-   if reqBook.status_code != 200 : return make_response(reqBook.content, 409)
-   return make_response(reqBook.content, 200)
+   if request.method == 'POST':
+      with grpc.insecure_channel('localhost:3003') as channel:
+         stub = booking_pb2_grpc.BookingStub(channel)
+         print("-------------- AddBookingByUser --------------")
+         stub.AddBookingByUser(booking_pb2.BookingData(userid=userid, date=super_pb2.TimeShow(date=req['date'], movies=[req['movie']])))
+      channel.close()
+   else:
+      with grpc.insecure_channel('localhost:3003') as channel:
+         stub = booking_pb2_grpc.BookingStub(channel)
+         print("-------------- DeleteBookingByUser --------------")
+         stub.DeleteBookingByUser(booking_pb2.BookingData(userid=userid, date=super_pb2.TimeShow(date=req['date'], movies=[req['movie']])))
+      channel.close()
+   return get_booking_user(userid)
 
 if __name__ == "__main__":
    print("Server running in port %s"%(PORT))
