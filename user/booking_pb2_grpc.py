@@ -4,6 +4,7 @@ import grpc
 import warnings
 
 import booking_pb2 as booking__pb2
+import super_pb2 as super__pb2
 
 GRPC_GENERATED_VERSION = '1.66.1'
 GRPC_VERSION = grpc.__version__
@@ -34,20 +35,20 @@ class BookingStub(object):
         Args:
             channel: A grpc.Channel.
         """
-        self.GetBookingsByUser = channel.unary_stream(
+        self.GetBookingsByUser = channel.unary_unary(
                 '/Booking/GetBookingsByUser',
                 request_serializer=booking__pb2.UserID.SerializeToString,
-                response_deserializer=booking__pb2.BookingData.FromString,
+                response_deserializer=booking__pb2.Bookings.FromString,
                 _registered_method=True)
-        self.GetBookings = channel.unary_stream(
+        self.GetBookings = channel.unary_unary(
                 '/Booking/GetBookings',
-                request_serializer=booking__pb2.Empty.SerializeToString,
-                response_deserializer=booking__pb2.BookingData.FromString,
+                request_serializer=super__pb2.Empty.SerializeToString,
+                response_deserializer=booking__pb2.Bookings.FromString,
                 _registered_method=True)
         self.AddBookingByUser = channel.unary_unary(
                 '/Booking/AddBookingByUser',
-                request_serializer=booking__pb2.UserID.SerializeToString,
-                response_deserializer=booking__pb2.BookingData.FromString,
+                request_serializer=booking__pb2.BookingData.SerializeToString,
+                response_deserializer=super__pb2.Empty.FromString,
                 _registered_method=True)
 
 
@@ -75,20 +76,20 @@ class BookingServicer(object):
 
 def add_BookingServicer_to_server(servicer, server):
     rpc_method_handlers = {
-            'GetBookingsByUser': grpc.unary_stream_rpc_method_handler(
+            'GetBookingsByUser': grpc.unary_unary_rpc_method_handler(
                     servicer.GetBookingsByUser,
                     request_deserializer=booking__pb2.UserID.FromString,
-                    response_serializer=booking__pb2.BookingData.SerializeToString,
+                    response_serializer=booking__pb2.Bookings.SerializeToString,
             ),
-            'GetBookings': grpc.unary_stream_rpc_method_handler(
+            'GetBookings': grpc.unary_unary_rpc_method_handler(
                     servicer.GetBookings,
-                    request_deserializer=booking__pb2.Empty.FromString,
-                    response_serializer=booking__pb2.BookingData.SerializeToString,
+                    request_deserializer=super__pb2.Empty.FromString,
+                    response_serializer=booking__pb2.Bookings.SerializeToString,
             ),
             'AddBookingByUser': grpc.unary_unary_rpc_method_handler(
                     servicer.AddBookingByUser,
-                    request_deserializer=booking__pb2.UserID.FromString,
-                    response_serializer=booking__pb2.BookingData.SerializeToString,
+                    request_deserializer=booking__pb2.BookingData.FromString,
+                    response_serializer=super__pb2.Empty.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -112,12 +113,12 @@ class Booking(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_stream(
+        return grpc.experimental.unary_unary(
             request,
             target,
             '/Booking/GetBookingsByUser',
             booking__pb2.UserID.SerializeToString,
-            booking__pb2.BookingData.FromString,
+            booking__pb2.Bookings.FromString,
             options,
             channel_credentials,
             insecure,
@@ -139,12 +140,12 @@ class Booking(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_stream(
+        return grpc.experimental.unary_unary(
             request,
             target,
             '/Booking/GetBookings',
-            booking__pb2.Empty.SerializeToString,
-            booking__pb2.BookingData.FromString,
+            super__pb2.Empty.SerializeToString,
+            booking__pb2.Bookings.FromString,
             options,
             channel_credentials,
             insecure,
@@ -170,8 +171,8 @@ class Booking(object):
             request,
             target,
             '/Booking/AddBookingByUser',
-            booking__pb2.UserID.SerializeToString,
-            booking__pb2.BookingData.FromString,
+            booking__pb2.BookingData.SerializeToString,
+            super__pb2.Empty.FromString,
             options,
             channel_credentials,
             insecure,

@@ -199,12 +199,14 @@ def get_booking_user(userid : str) -> str:
    """Searches all the bookings of an user in the database"""
    with grpc.insecure_channel('localhost:3003') as channel:
       stub = booking_pb2_grpc.BookingStub(channel)
+      print(stub)
       print("-------------- GetBookingByUser --------------")
-      bookings = stub.GetBookingsByUser(booking_pb2.UserID(userid=userid))
+      bookings = stub.GetBookingsByUser(booking_pb2.UserID(userid=userid)).bookings
+      print("Everything is going great.")
    channel.close()
-   for booking in bookings:
-      print(booking)
-   return make_response(bookings, 200)
+   convertedBookings = {'bookings' : [{'userid' : booking.userid, 'date' : booking.date.date, 'movies' : booking.date.movies } for booking in bookings]}
+   print(convertedBookings)
+   return make_response(convertedBookings, 200)
 
 #@app.route("/users/<userid>/bookings/details", methods = ['GET'])
 #def get_detailed_booking_user(userid : str) -> str:
