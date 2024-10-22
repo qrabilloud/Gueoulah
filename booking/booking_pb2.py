@@ -25,7 +25,7 @@ _sym_db = _symbol_database.Default()
 import super_pb2 as super__pb2
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\rbooking.proto\x1a\x0bsuper.proto\"\x18\n\x06UserID\x12\x0e\n\x06userid\x18\x01 \x01(\t\"*\n\x08\x42ookings\x12\x1e\n\x08\x62ookings\x18\x01 \x03(\x0b\x32\x0c.BookingData\"6\n\x0b\x42ookingData\x12\x0e\n\x06userid\x18\x01 \x01(\t\x12\x17\n\x04\x64\x61te\x18\x02 \x01(\x0b\x32\t.TimeShow2\x84\x01\n\x07\x42ooking\x12)\n\x11GetBookingsByUser\x12\x07.UserID\x1a\t.Bookings\"\x00\x12\"\n\x0bGetBookings\x12\x06.Empty\x1a\t.Bookings\"\x00\x12*\n\x10\x41\x64\x64\x42ookingByUser\x12\x0c.BookingData\x1a\x06.Empty\"\x00\x62\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\rbooking.proto\x1a\x0bsuper.proto\"\x18\n\x06UserID\x12\x0e\n\x06userid\x18\x01 \x01(\t\"*\n\x08\x42ookings\x12\x1e\n\x08\x62ookings\x18\x01 \x03(\x0b\x32\x0c.BookingData\"6\n\x0b\x42ookingData\x12\x0e\n\x06userid\x18\x01 \x01(\t\x12\x17\n\x04\x64\x61te\x18\x02 \x01(\x0b\x32\t.TimeShow2\xb3\x01\n\x07\x42ooking\x12)\n\x11GetBookingsByUser\x12\x07.UserID\x1a\t.Bookings\"\x00\x12\"\n\x0bGetBookings\x12\x06.Empty\x1a\t.Bookings\"\x00\x12*\n\x10\x41\x64\x64\x42ookingByUser\x12\x0c.BookingData\x1a\x06.Empty\"\x00\x12-\n\x13\x44\x65leteBookingByUser\x12\x0c.BookingData\x1a\x06.Empty\"\x00\x62\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -39,5 +39,5 @@ if not _descriptor._USE_C_DESCRIPTORS:
   _globals['_BOOKINGDATA']._serialized_start=100
   _globals['_BOOKINGDATA']._serialized_end=154
   _globals['_BOOKING']._serialized_start=157
-  _globals['_BOOKING']._serialized_end=289
+  _globals['_BOOKING']._serialized_end=336
 # @@protoc_insertion_point(module_scope)

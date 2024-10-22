@@ -50,6 +50,11 @@ class BookingStub(object):
                 request_serializer=booking__pb2.BookingData.SerializeToString,
                 response_deserializer=super__pb2.Empty.FromString,
                 _registered_method=True)
+        self.DeleteBookingByUser = channel.unary_unary(
+                '/Booking/DeleteBookingByUser',
+                request_serializer=booking__pb2.BookingData.SerializeToString,
+                response_deserializer=super__pb2.Empty.FromString,
+                _registered_method=True)
 
 
 class BookingServicer(object):
@@ -73,6 +78,12 @@ class BookingServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
+    def DeleteBookingByUser(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
 
 def add_BookingServicer_to_server(servicer, server):
     rpc_method_handlers = {
@@ -88,6 +99,11 @@ def add_BookingServicer_to_server(servicer, server):
             ),
             'AddBookingByUser': grpc.unary_unary_rpc_method_handler(
                     servicer.AddBookingByUser,
+                    request_deserializer=booking__pb2.BookingData.FromString,
+                    response_serializer=super__pb2.Empty.SerializeToString,
+            ),
+            'DeleteBookingByUser': grpc.unary_unary_rpc_method_handler(
+                    servicer.DeleteBookingByUser,
                     request_deserializer=booking__pb2.BookingData.FromString,
                     response_serializer=super__pb2.Empty.SerializeToString,
             ),
@@ -171,6 +187,33 @@ class Booking(object):
             request,
             target,
             '/Booking/AddBookingByUser',
+            booking__pb2.BookingData.SerializeToString,
+            super__pb2.Empty.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def DeleteBookingByUser(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/Booking/DeleteBookingByUser',
             booking__pb2.BookingData.SerializeToString,
             super__pb2.Empty.FromString,
             options,
