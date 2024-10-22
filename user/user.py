@@ -64,7 +64,6 @@ def update_user(userid : str) -> str:
    if req['id'] != userid and isUserExisting(req['id']): return make_response("Id already used by another user", 409)
    for user in users:
       if user['id'] == userid:
-         print("Yo")
          user['id'] = req['id']
          user['name'] = req['name']
          user['last_active'] = req['last_active']
@@ -98,7 +97,6 @@ def makeResponseMovie(respMovie, function, messageNoData = None):
    """Create the response for Rest using the result of the GraphQL request"""
    if respMovie.status_code != 200 : return make_response(respMovie.content, 500)
    respJson = respMovie.json()
-   print(respJson)
    if 'errors' in respJson: return make_response(respJson['errors'][0]['message'], 400)
    res = respJson['data'][function]
    if res == None : return make_response(messageNoData if messageNoData else "", 400 if messageNoData else 200)
